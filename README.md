@@ -15,3 +15,6 @@
 * HTML5
 * CSS3
 * JavaScript (ES6)
+
+## Live Demo
+https://awkk1.github.io/todo-list/
