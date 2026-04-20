@@ -10,8 +10,10 @@
     --interface-create-task-bg: #F8F5F2;
     --interface-create-task-button-bg: ;
     
-    --interface-filter-bg: #F8F5F2;
+    --interface-filter-container-bg: #F8F5F2;
     --interface-filter-button-bg: #F8F5F2;
+    --interface-filter-button-color-text: #333;
+    --interface-active-filter-button-bg: #F8EDAD;
 
     --interface-list-of-task-bg: #fefefe;
 }
@@ -26,8 +28,9 @@
 
     --interface-create-task-bg: #475569;
 
-    --interface-filter-bg: #334155;
+    --interface-filter-container-bg: #334155;
     --interface-filter-button-bg: #334155;
+    --interface-filter-button-color-text: rgba(255, 255, 255, 0.9);
 
     --interface-list-of-task-bg: #475569;
 }
@@ -177,34 +180,36 @@ form button:hover {
     transform: scale(1.1);
 }
 
-div.filter {
+/* Filter */
+.filter-container {
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 15px;
     width: fit-content;
-    background-color: var(--interface-filter-bg);
     border-radius: 15px;
     margin: 0 auto;
-    padding: 4px;
+    padding: 6px;
+    background-color: var(--interface-filter-container-bg);
     box-shadow: 10px 10px 15px rgba(0, 0, 0, 0.1);
 }
 
-div.filter button {
+.filter-btn {
     display: flex;
-    gap: 5px;
     align-items: center;
-    border: none;
-    background-color: var(--interface-filter-button-bg);
-    color: var(--text-primary);
+    gap: 5px;
     padding: 8px;
+    border: none;
+    background: var(--interface-filter-button-bg);
+    color: var(--interface-filter-button-color-text);
     cursor: pointer;
 }
 
-div.filter button + button {
+.filter-container button + button {
     border-left: 1px solid rgba(0, 0, 0, 0.03);
 }
 
+/* Tasks */
 .interface-tasks {
     margin-bottom: 15px;
 }
@@ -260,6 +265,14 @@ div.filter button + button {
     padding: 15px;
     background: var(--interface-list-of-task-bg);
     margin-bottom: 5px;
+    transition:
+        background-color 0.2s,
+        transform 0.5s,
+        opacity 0.5s;
+}
+
+.list-of-tasks li:hover {
+    background-color: #C2D8C4;
 }
 
 .list-of-tasks li:last-of-type {
@@ -332,10 +345,20 @@ div.filter button + button {
 }
 
 /*active filter button*/
-.active-filter-button {
-    background: linear-gradient(135deg, #2a3241, #2b3343, #293141);
+.active {
+    background: var(--interface-active-filter-button-bg);
     border-radius: 12px;
     width: 100%;
     height: 100%;
-    color: white;
+    color: var(--interface-filter-button-color-text);
+}
+
+li.task-for-delete {
+    opacity: 0;
+    transform: scale(0.9);
+}
+
+input:focus {
+    outline: none;
+    border: 1.5px solid #c5e77c;
 }
