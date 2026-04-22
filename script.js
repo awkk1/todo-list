@@ -46,17 +46,24 @@ form.addEventListener("submit", function (e) {
 function renderTasks() {
     list.innerHTML = "";
     if (tasks.length === 0) {
-        let li_none = document.createElement("li");
-        let p_none = document.createElement("p");
-        p_none.textContent = "Нет задач";
-        li_none.appendChild(p_none);
-        li_none.classList.add("not-a-task");
-        list.appendChild(li_none);
+        let li_tasks_empty = document.createElement("li");
+
+        let p_title = document.createElement("p");
+        p_title.textContent = "Нет задач ✨";
+
+        let p_subtitle = document.createElement("p");
+        p_subtitle.textContent =  "Добавьте первую задачу 👇"
+        
+        li_tasks_empty.appendChild(p_title);
+        li_tasks_empty.appendChild(p_subtitle);
+        li_tasks_empty.classList.add("task-empty");
+        list.appendChild(li_tasks_empty);
     }
     else
         for (let i = 0; i < tasks.length; i++) {
             let li = document.createElement("li");
             li.dataset.index = i;
+            li.classList.add("task");
             list.appendChild(li);
 
             let checkbox = document.createElement("input");
@@ -89,6 +96,67 @@ function renderTasks() {
         }
 };
 
+list.addEventListener("dblclick", function (e) {
+    let li = e.target.closest(".task");
+
+    if (!li) return;
+    if (e.target.closest("button") || e.target.type === "checkbox") return;
+    if (list.querySelector(".edit-input")) return;
+
+    const li_index = Number(li.dataset.index);
+    let inputNew= document.createElement("input");
+    let p = li.querySelector("p");
+    const p_content = p.textContent;
+    inputNew.classList.add("edit-input");
+    inputNew.name = "editing";
+    p.replaceWith(inputNew);
+    inputNew.value = p_content;
+    inputNew.focus();
+    inputNew.select();
+    
+    let isSaved = false;
+
+    function saveEdit() {
+        if (inputNew.value.trim() === "") {
+            li.classList.add("task-for-delete");
+            setTimeout(() => {
+            tasks.splice(li_index, 1);
+            localStorage.setItem("tasks", JSON.stringify(tasks));
+            renderTasks();
+            updateCounter();
+            applyFilter();
+        },
+            505);
+            return;
+        } else {
+            isSaved = true;
+            inputNew.replaceWith(p);
+            p.textContent = inputNew.value;
+            tasks[li_index].text = inputNew.value;
+            localStorage.setItem("tasks", JSON.stringify(tasks));
+        }
+    }
+
+    function cancelEdit() {
+        isSaved = true;
+        inputNew.replaceWith(p);
+        p.textContent = p_content;
+    }
+
+    inputNew.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" && isSaved === false) {
+            saveEdit();
+        } else if (e.key === "Escape") {
+            cancelEdit();
+        }
+    })
+
+    inputNew.addEventListener("blur", function (e) {
+        if (isSaved) return;
+        saveEdit();
+    })
+});
+
 list.addEventListener("click", function (e) {
     let li = e.target.closest("li");
     if (!li) {
@@ -101,7 +169,6 @@ list.addEventListener("click", function (e) {
 
     if (e.target.closest("button")) {
         li.classList.add("task-for-delete");
-        console.log(li.classList);
         setTimeout(() => {
             tasks.splice(index, 1);
             localStorage.setItem("tasks", JSON.stringify(tasks));

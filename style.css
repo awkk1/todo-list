@@ -2,6 +2,7 @@
     --body-bg: #C2D8C4;
     --text-primary: black;
     --text-secondary: rgba(0, 0, 0, 0.7);
+    --button-theme-toggle-color: rgb(0, 0, 0);
     
     --interface-bg: #F8F5F2;
     --interface-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
@@ -21,6 +22,7 @@
     --body-bg: linear-gradient(135deg, #0f172a, #111827, #1e293b);
     --text-primary: #f8fafc;
     --text-secondary: rgba(255, 255, 255, 0.7);
+    --button-theme-toggle-color: #e4d616;
 
     --interface-bg: #1e293b;
     --interface-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
@@ -66,7 +68,7 @@ body {
     padding: none;
     align-items: center;
     cursor: pointer;
-    color: var(--text-primary);
+    color: var(--button-theme-toggle-color);
 }
 
 .name {
@@ -273,8 +275,8 @@ form button:hover {
         opacity 0.5s;
 }
 
-.list-of-tasks li:hover {
-    background-color: #C2D8C4;
+.list-of-tasks li.task:hover {
+    background-color: rgba(194, 216, 196, 0.8);
 }
 
 .list-of-tasks li:last-of-type {
@@ -354,4 +356,28 @@ li.task-for-delete {
 input:focus {
     outline: none;
     border: 1.5px solid #c5e77c;
+}
+
+.list-of-tasks .task-empty {
+    flex-direction: column;
+    justify-content: center;
+    min-height: 80px;
+}
+
+.task-empty p:first-child {
+    font-size: 20px;
+}
+
+.task-empty p:last-child {
+    opacity: 0.75;
+    font-size: 14px;
+}
+
+.edit-input {
+    flex: 1;
+    background: transparent;
+    outline: none;
+    border-radius: 8px;
+    padding: 6px;
+    color: var(--text-primary);
 }
