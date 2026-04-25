@@ -381,3 +381,18 @@ input:focus {
     padding: 6px;
     color: var(--text-primary);
 }
+
+.button-for-edit {
+    appearance: none;
+    box-sizing: border-box;
+    background: transparent;
+    color: var(--text-primary);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.button-for-edit:hover {
+    scale: 1.1;
+    color: #c5e77c
+}
