@@ -262,13 +262,14 @@ form button:hover {
 
 .list-of-tasks li {
     display: flex;
-    gap: 15px;
+    gap: 0;
     align-items: center;
     border: 1px solid rgba(0, 0, 0, 0.03);
     border-radius: 12px;
     padding: 15px;
     background: var(--interface-list-of-task-bg);
     margin-bottom: 5px;
+    overflow: hidden;
     transition:
         background-color 0.2s,
         transform 0.5s,
@@ -285,7 +286,7 @@ form button:hover {
 
 .list-of-tasks li p {
     flex: 1;
-    margin: 0;
+    margin: 0 15px 0 0;
     padding: 0;
     font-size: 18px;
     font-family: sans-serif;
@@ -293,14 +294,11 @@ form button:hover {
 }
 
 .list-of-tasks .delete-task-button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
     background: transparent;
     cursor: pointer;
-    padding: 5px;
     border: none;
     color: rgba(255, 0, 0, 0.7);
+    transition: all 0.3s;
 }
 
 .list-of-tasks .delete-task-button:hover {
@@ -314,6 +312,7 @@ form button:hover {
     width: 22px;
     height: 22px;
     margin: auto;
+    margin-right: 10px;
     border: 1px solid #222;
     border-radius: 3px;
     transition: 0.2s all;
@@ -380,6 +379,7 @@ input:focus {
     border-radius: 8px;
     padding: 6px;
     color: var(--text-primary);
+    margin: 0 15px 0 0;
 }
 
 .button-for-edit {
@@ -395,4 +395,17 @@ input:focus {
 .button-for-edit:hover {
     scale: 1.1;
     color: #c5e77c
+}
+
+.edit-input{
+    border: 1.5px solid #c5e77c;
+}
+
+.task.editing .delete-task-button {
+    opacity: 0.8;
+    width: 0;
+    min-width: 0;
+    padding: 0;
+    margin: 0;
+    transform: translateX(45px);
 }

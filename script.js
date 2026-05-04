@@ -85,6 +85,7 @@ function renderTasks() {
 
             let buttonForEdit = document.createElement("button");
             buttonForEdit.classList.add("button-for-edit");
+            buttonForEdit.type = "button";
             buttonForEdit.dataset.action = "edit";
             const editIcon = `
             <svg width="20px" height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -96,6 +97,7 @@ function renderTasks() {
 
             let buttonForDelete = document.createElement("button");
             buttonForDelete.classList.add("delete-task-button");
+            buttonForDelete.type = "button";
             buttonForDelete.dataset.action = "delete";
 
             const trashIcon = `
@@ -108,9 +110,20 @@ function renderTasks() {
         }
 };
 
+function deleteTask(li, index) {
+    li.classList.add("task-for-delete");
+    setTimeout(() => {
+        tasks.splice(index, 1);
+        localStorage.setItem("tasks", JSON.stringify(tasks));
+        renderTasks();
+        updateCounter();
+        applyFilter();
+    },
+        505);
+}
+
 list.addEventListener("dblclick", function (e) {
     let li = e.target.closest(".task");
-
     if (!li) return;
     if (e.target.closest("button") || e.target.type === "checkbox") return;
     if (list.querySelector(".edit-input")) return;
@@ -119,10 +132,15 @@ list.addEventListener("dblclick", function (e) {
 });
 
 function startEdit(li) {
-    const li_index = Number(li.dataset.index);
-    let inputNew= document.createElement("input");
+    let isSaved = false;
+
+    let inputNew = document.createElement("input");
     let p = li.querySelector("p");
     const p_content = p.textContent;
+
+    li.dataset.oldValue = p_content;
+
+    li.classList.add("editing");
     inputNew.classList.add("edit-input");
     inputNew.name = "editing";
     p.replaceWith(inputNew);
@@ -130,47 +148,61 @@ function startEdit(li) {
     inputNew.focus();
     inputNew.select();
 
-    let isSaved = false;
-
-    function saveEdit() {
-        if (inputNew.value.trim() === "") {
-            li.classList.add("task-for-delete");
-            setTimeout(() => {
-            tasks.splice(li_index, 1);
-            localStorage.setItem("tasks", JSON.stringify(tasks));
-            renderTasks();
-            updateCounter();
-            applyFilter();
-        },
-            505);
-            return;
-        } else {
-            isSaved = true;
-            inputNew.replaceWith(p);
-            p.textContent = inputNew.value;
-            tasks[li_index].text = inputNew.value;
-            localStorage.setItem("tasks", JSON.stringify(tasks));
-        }
-    }
-
-    function cancelEdit() {
-        isSaved = true;
-        inputNew.replaceWith(p);
-        p.textContent = p_content;
-    }
-
     inputNew.addEventListener("keydown", function (e) {
         if (e.key === "Enter" && isSaved === false) {
-            saveEdit();
-        } else if (e.key === "Escape") {
-            cancelEdit();
+            isSaved = true;
+            saveEdit(li);
+        } 
+        else if (e.key === "Escape") {
+            isSaved = true;
+            cancelEdit(li);
         }
     })
 
     inputNew.addEventListener("blur", function (e) {
         if (isSaved) return;
-        saveEdit();
+        let nextElement = e.relatedTarget;
+        if (nextElement === null) {
+            saveEdit(li);
+            return;
+        }
+
+        let editButton = nextElement.closest('[data-action="edit"]');
+        let editLi = editButton.closest('.task');
+        if (editLi === li) return;
     })
+}
+
+let saveEdit = function(li) {
+    const index = Number(li.dataset.index);
+    let input = li.querySelector('.edit-input');
+    if (!input) return;
+
+    if (input.value.trim() === "") {
+        deleteTask(li, index);
+        return;
+    }
+    let p = document.createElement('p');
+    if (tasks[index].done) {
+        p.classList.add('completed');
+    }
+
+    li.classList.remove("editing");
+    input.replaceWith(p);
+    p.textContent = input.value;
+    tasks[index].text = input.value;
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+    delete li.dataset.oldValue;
+}
+
+let cancelEdit = function(li) {
+    let input = li.querySelector(".edit-input");
+    if (!input) return;
+    li.classList.remove("editing");
+    let p = document.createElement('p');
+    p.textContent = li.dataset.oldValue;
+    input.replaceWith(p);
+    delete li.dataset.oldValue;
 }
 
 list.addEventListener("click", function (e) {
@@ -184,18 +216,19 @@ list.addEventListener("click", function (e) {
     let index = Number(li.dataset.index);
 
     if (e.target.closest('[data-action="delete"]')) {
-        li.classList.add("task-for-delete");
-        setTimeout(() => {
-            tasks.splice(index, 1);
-            localStorage.setItem("tasks", JSON.stringify(tasks));
-            renderTasks();
-            updateCounter();
-            applyFilter();
-        },
-            505);
+        deleteTask(li, index);
         return;
     } else if (e.target.closest('[data-action="edit"]')) {
-        startEdit(li);
+        if (li.classList.contains("editing")) {
+            saveEdit(li);
+            return;
+        } else {
+            if (list.querySelector(".editing")) {
+                return
+            }
+            startEdit(li);
+            return;
+        }
     };
 
     if (e.target.type === "checkbox") {
