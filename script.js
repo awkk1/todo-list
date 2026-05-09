@@ -1,12 +1,16 @@
-let body = document.querySelector("body");
-let form = document.querySelector("form");
-let list = document.querySelector(".list-of-tasks");
-let input = document.querySelector("#task");
-let filter = document.querySelector(".filter-container");
+// DOM
+const body = document.querySelector("body");
+const form = document.querySelector("form");
+const list = document.querySelector(".list-of-tasks");
+const input = document.querySelector("#task");
+const filter = document.querySelector(".filter-container");
+const button = document.querySelector(".button-theme-toggle");
+
+// State
+let tasks = [];
 let currentFilter = 'all';
 
-let tasks = [];
-
+// Storage keys
 let saved = localStorage.getItem("tasks");
 let themeNow = localStorage.getItem("theme");
 
@@ -18,9 +22,17 @@ if (themeNow === "dark") {
     body.classList.add("dark-theme");
 }
 
-renderTasks();
-updateCounter();
-applyFilter();
+updateUI();
+
+function saveStorage(key, value) {
+    localStorage.setItem(key, JSON.stringify(value));
+}
+
+function updateUI() {
+    renderTasks();
+    updateCounter();
+    applyFilter();
+}
 
 form.addEventListener("submit", function (e) {
     e.preventDefault();
@@ -37,21 +49,19 @@ form.addEventListener("submit", function (e) {
         text: text,
         done: false
     });
-    localStorage.setItem("tasks", JSON.stringify(tasks));
-    renderTasks();
-    updateCounter();
-    applyFilter();
+    saveStorage('tasks', tasks);
+    updateUI();
 });
 
 function renderTasks() {
     list.innerHTML = "";
     if (tasks.length === 0) {
-        let li_tasks_empty = document.createElement("li");
+        const li_tasks_empty = document.createElement("li");
 
-        let p_title = document.createElement("p");
+        const p_title = document.createElement("p");
         p_title.textContent = "Нет задач ✨";
 
-        let p_subtitle = document.createElement("p");
+        const p_subtitle = document.createElement("p");
         p_subtitle.textContent =  "Добавьте первую задачу 👇"
         
         li_tasks_empty.appendChild(p_title);
@@ -61,12 +71,12 @@ function renderTasks() {
     }
     else
         for (let i = 0; i < tasks.length; i++) {
-            let li = document.createElement("li");
+            const li = document.createElement("li");
             li.dataset.index = i;
             li.classList.add("task");
             list.appendChild(li);
 
-            let checkbox = document.createElement("input");
+            const checkbox = document.createElement("input");
             checkbox.type = "checkbox";
             checkbox.name = "task";
             if (tasks[i].done) {
@@ -76,14 +86,14 @@ function renderTasks() {
             };
             li.appendChild(checkbox);
 
-            let p = document.createElement("p");
+            const p = document.createElement("p");
             p.textContent = tasks[i].text;
             if (tasks[i].done) {
                 p.classList.add("completed")
             }
             li.appendChild(p);
 
-            let buttonForEdit = document.createElement("button");
+            const buttonForEdit = document.createElement("button");
             buttonForEdit.classList.add("button-for-edit");
             buttonForEdit.type = "button";
             buttonForEdit.dataset.action = "edit";
@@ -95,7 +105,7 @@ function renderTasks() {
             buttonForEdit.innerHTML = editIcon;
             li.appendChild(buttonForEdit);
 
-            let buttonForDelete = document.createElement("button");
+            const buttonForDelete = document.createElement("button");
             buttonForDelete.classList.add("delete-task-button");
             buttonForDelete.type = "button";
             buttonForDelete.dataset.action = "delete";
@@ -114,16 +124,14 @@ function deleteTask(li, index) {
     li.classList.add("task-for-delete");
     setTimeout(() => {
         tasks.splice(index, 1);
-        localStorage.setItem("tasks", JSON.stringify(tasks));
-        renderTasks();
-        updateCounter();
-        applyFilter();
+        saveStorage('tasks', tasks);
+        updateUI();
     },
         505);
 }
 
 list.addEventListener("dblclick", function (e) {
-    let li = e.target.closest(".task");
+    const li = e.target.closest(".task");
     if (!li) return;
     if (e.target.closest("button") || e.target.type === "checkbox") return;
     if (list.querySelector(".edit-input")) return;
@@ -134,8 +142,8 @@ list.addEventListener("dblclick", function (e) {
 function startEdit(li) {
     let isSaved = false;
 
-    let inputNew = document.createElement("input");
-    let p = li.querySelector("p");
+    const inputNew = document.createElement("input");
+    const p = li.querySelector("p");
     const p_content = p.textContent;
 
     li.dataset.oldValue = p_content;
@@ -161,28 +169,28 @@ function startEdit(li) {
 
     inputNew.addEventListener("blur", function (e) {
         if (isSaved) return;
-        let nextElement = e.relatedTarget;
+        const nextElement = e.relatedTarget;
         if (nextElement === null) {
             saveEdit(li);
             return;
         }
 
-        let editButton = nextElement.closest('[data-action="edit"]');
-        let editLi = editButton.closest('.task');
+        const editButton = nextElement.closest('[data-action="edit"]');
+        const editLi = editButton.closest('.task');
         if (editLi === li) return;
     })
 }
 
-let saveEdit = function(li) {
+function saveEdit (li) {
     const index = Number(li.dataset.index);
-    let input = li.querySelector('.edit-input');
+    const input = li.querySelector('.edit-input');
     if (!input) return;
 
     if (input.value.trim() === "") {
         deleteTask(li, index);
         return;
     }
-    let p = document.createElement('p');
+    const p = document.createElement('p');
     if (tasks[index].done) {
         p.classList.add('completed');
     }
@@ -191,29 +199,29 @@ let saveEdit = function(li) {
     input.replaceWith(p);
     p.textContent = input.value;
     tasks[index].text = input.value;
-    localStorage.setItem("tasks", JSON.stringify(tasks));
+    saveStorage('tasks', tasks);
     delete li.dataset.oldValue;
 }
 
-let cancelEdit = function(li) {
-    let input = li.querySelector(".edit-input");
+function cancelEdit (li) {
+    const input = li.querySelector(".edit-input");
     if (!input) return;
     li.classList.remove("editing");
-    let p = document.createElement('p');
+    const p = document.createElement('p');
     p.textContent = li.dataset.oldValue;
     input.replaceWith(p);
     delete li.dataset.oldValue;
 }
 
 list.addEventListener("click", function (e) {
-    let li = e.target.closest(".task");
+    const li = e.target.closest(".task");
     if (!li) {
         return
     }
     if (li.dataset.index === undefined) {
         return
     }
-    let index = Number(li.dataset.index);
+    const index = Number(li.dataset.index);
 
     if (e.target.closest('[data-action="delete"]')) {
         deleteTask(li, index);
@@ -237,30 +245,28 @@ list.addEventListener("click", function (e) {
         } else {
             tasks[index].done = false;
         }
-        localStorage.setItem("tasks", JSON.stringify(tasks));
-        renderTasks();
-        updateCounter();
-        applyFilter();
+        saveStorage('tasks', tasks);
+        updateUI();
     }
 });
 
 function updateCounter() {
-    let allLi = document.querySelectorAll(".list-of-tasks li");
+    const allLi = document.querySelectorAll(".list-of-tasks li");
     let liTask = 0;
     for (let li of allLi) {
         if (li.dataset.index !== undefined) {
             liTask++;
         }
     }
-    let allChecked = list.querySelectorAll("input:checked");
-    let output = document.querySelector("output");
+    const allChecked = list.querySelectorAll("input:checked");
+    const output = document.querySelector("output");
     output.innerHTML = `<span>${allChecked.length}</span> из ${liTask} выполнено`
 };
 
 filter.addEventListener("click", function (e) {
-    let btn = e.target.closest("button");
-    let liArray = document.querySelectorAll(".list-of-tasks li")
-    let allBtn = document.querySelectorAll(".filter-btn");
+    const btn = e.target.closest("button");
+    const liArray = document.querySelectorAll(".list-of-tasks li")
+    const allBtn = document.querySelectorAll(".filter-btn");
 
     if (btn) {
         for (let button of allBtn) {
@@ -278,7 +284,7 @@ filter.addEventListener("click", function (e) {
 function applyFilter() {
     liArray = document.querySelectorAll(".list-of-tasks li");
     liArray.forEach(element => {
-        let inputel = element.querySelector("input");
+        const inputel = element.querySelector("input");
         if (inputel === null) {
             return
         }
@@ -302,7 +308,6 @@ function applyFilter() {
 }
 
 /* Переключение темы */
-let button = document.querySelector(".button-theme-toggle")
 const sunIcon = `<svg width="45px" height="45px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M12 3V4M12 20V21M4 12H3M6.31412 6.31412L5.5 5.5M17.6859 6.31412L18.5 5.5M6.31412 17.69L5.5 18.5001M17.6859 17.69L18.5 18.5001M21 12H20M16 12C16 14.2091 14.2091 16 12 16C9.79086 16 8 14.2091 8 12C8 9.79086 9.79086 8 12 8C14.2091 8 16 9.79086 16 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>`;
@@ -314,14 +319,15 @@ if (themeNow === "dark") {
 } else {
     button.innerHTML = sunIcon;
 }
+
 button.addEventListener("click", function (e) {
     body.classList.toggle("dark-theme");
-    
+
     if (body.classList.contains("dark-theme")) {
         button.innerHTML = moonIcon;
-        localStorage.setItem("theme", ("dark"));
+        localStorage.setItem('theme', "dark");
     } else {
         button.innerHTML = sunIcon;
-        localStorage.setItem("theme", ("light"));
+        localStorage.setItem('theme', "light");
     }
 });
