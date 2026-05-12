@@ -293,7 +293,7 @@ form button:hover {
     color: var(--text-primary);
 }
 
-.list-of-tasks .delete-task-button {
+.list-of-tasks .button-for-delete {
     background: transparent;
     cursor: pointer;
     border: none;
@@ -301,7 +301,7 @@ form button:hover {
     transition: all 0.3s;
 }
 
-.list-of-tasks .delete-task-button:hover {
+.list-of-tasks .button-for-delete:hover {
     cursor: pointer;
     transform: scale(1.25);
 }
@@ -401,7 +401,7 @@ input:focus {
     border: 1.5px solid #c5e77c;
 }
 
-.task.editing .delete-task-button {
+.task.editing .button-for-delete {
     opacity: 0.8;
     width: 0;
     min-width: 0;

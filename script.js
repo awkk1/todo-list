@@ -5,6 +5,7 @@ const list = document.querySelector(".list-of-tasks");
 const input = document.querySelector("#task");
 const filter = document.querySelector(".filter-container");
 const button = document.querySelector(".button-theme-toggle");
+const taskTemplate = document.querySelector("#task-template").content;
 
 // State
 let tasks = [];
@@ -71,10 +72,26 @@ function renderTasks() {
     }
     else
         for (let i = 0; i < tasks.length; i++) {
+            const taskTemplateClone = taskTemplate.cloneNode(true);
+            const taskli = taskTemplateClone.querySelector("li");
+            taskli.dataset.index = i;
+
+            const checkboxli = taskTemplateClone.querySelector("input");
+            if (tasks[i].done) {
+                checkboxli.checked = true;
+            }
+
+            const textli = taskTemplateClone.querySelector("p");
+            textli.textContent = tasks[i].text;
+            if (tasks[i].done) {
+                textli.classList.add("completed")
+            }
+            list.appendChild(taskTemplateClone);
+        }
+            /*
             const li = document.createElement("li");
             li.dataset.index = i;
             li.classList.add("task");
-            list.appendChild(li);
 
             const checkbox = document.createElement("input");
             checkbox.type = "checkbox";
@@ -106,7 +123,7 @@ function renderTasks() {
             li.appendChild(buttonForEdit);
 
             const buttonForDelete = document.createElement("button");
-            buttonForDelete.classList.add("delete-task-button");
+            buttonForDelete.classList.add("button-for-delete");
             buttonForDelete.type = "button";
             buttonForDelete.dataset.action = "delete";
 
@@ -117,7 +134,8 @@ function renderTasks() {
         `;
             buttonForDelete.innerHTML = trashIcon;
             li.appendChild(buttonForDelete);
-        }
+            list.appendChild(li);
+        */
 };
 
 function deleteTask(li, index) {
