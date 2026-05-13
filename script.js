@@ -12,8 +12,8 @@ let tasks = [];
 let currentFilter = 'all';
 
 // Storage keys
-let saved = localStorage.getItem("tasks");
-let themeNow = localStorage.getItem("theme");
+const saved = localStorage.getItem("tasks");
+const themeNow = localStorage.getItem("theme");
 
 if (saved) {
     tasks = JSON.parse(saved);
@@ -118,21 +118,21 @@ list.addEventListener("dblclick", function (e) {
 function startEdit(li) {
     let isSaved = false;
 
-    const inputNew = document.createElement("input");
-    const p = li.querySelector("p");
-    const p_content = p.textContent;
+    const editInput = document.createElement("input");
+    const taskTextElement = li.querySelector("p");
+    const oldText = taskTextElement.textContent;
 
-    li.dataset.oldValue = p_content;
+    li.dataset.oldValue = oldText;
 
     li.classList.add("editing");
-    inputNew.classList.add("edit-input");
-    inputNew.name = "editing";
-    p.replaceWith(inputNew);
-    inputNew.value = p_content;
-    inputNew.focus();
-    inputNew.select();
+    editInput.classList.add("edit-input");
+    taskTextElement.replaceWith(editInput);
+    editInput.value = oldText;
 
-    inputNew.addEventListener("keydown", function (e) {
+    editInput.focus();
+    editInput.select();
+
+    editInput.addEventListener("keydown", function (e) {
         if (e.key === "Enter" && isSaved === false) {
             isSaved = true;
             saveEdit(li);
@@ -143,7 +143,7 @@ function startEdit(li) {
         }
     })
 
-    inputNew.addEventListener("blur", function (e) {
+    editInput.addEventListener("blur", function (e) {
         if (isSaved) return;
         const nextElement = e.relatedTarget;
         if (nextElement === null) {
@@ -152,6 +152,10 @@ function startEdit(li) {
         }
 
         const editButton = nextElement.closest('[data-action="edit"]');
+        if (!editButton) {
+            saveEdit(li);
+            return;
+        }
         const editLi = editButton.closest('.task');
         if (editLi === li) return;
     })
